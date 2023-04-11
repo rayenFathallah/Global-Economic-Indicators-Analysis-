@@ -13,18 +13,26 @@ def rename_columns(df):
         df.columns = new_columns
     except:
         raise CustomException('Error while renaming the countries in rename_columns() function')
-
+    return df 
+    
 
 def fill_missing_values(df):
-    try : 
+    try :  
+    
         df.fillna(0, inplace=True)
     except:
         raise CustomException('Error while filling the missing values in fill_missing_values() function')
+
+
 
 def add_missing_countries(df, reference_df1,reference_df2):
     
 # Add missing countries for each dataframe 
     try : 
+        reference_df1=rename_columns(reference_df1)
+        reference_df2=rename_columns(reference_df2)
+        df=rename_columns(df)
+        columns = set(df.columns)
         columns = set(df.columns)
         reference1_columns = set(reference_df1.columns)
         reference2_columns = set(reference_df2.columns)
@@ -32,13 +40,20 @@ def add_missing_countries(df, reference_df1,reference_df2):
         df[not_in_df] = 0
     except:
         raise CustomException('Error while adding the missing countries in add_missing_countries() function')
-
+    return df 
+        
 def add_missing_dates(df, reference_df1,reference_df2):
 # Add missing Dates for each dataframe
     try : 
         dates = set(df['Year'].values)
-        reference1_dates = set(reference_df1['Year'].values)
-        reference2_dates = set(reference_df2['Year'].values)
+        if(reference_df1.empty==False): 
+            reference1_dates = set(reference_df1['Year'].values)
+        else : 
+            reference1_dates=set()
+        if(reference_df2.empty==False): 
+            reference2_dates = set(reference_df2['Year'].values) 
+        else : 
+            reference2_dates=set()  
         dates_not_in_df = list(reference1_dates.union(reference2_dates) - dates)
         additional_dataframe = pd.DataFrame(columns=df.columns)
         additional_dataframe['Year'] = dates_not_in_df
@@ -47,6 +62,28 @@ def add_missing_dates(df, reference_df1,reference_df2):
         df = pd.concat([additional_dataframe, df])
         return df
     except : 
+        raise CustomException('Error while adding the missing dates in add_missing_dates() function')
+def add_missing_dates2(df, *reference_dfs):
+    """
+    Add missing dates for each dataframe.
+
+    Parameters:
+    df (pandas.DataFrame): the dataframe to which missing dates should be added
+    *reference_dfs (pandas.DataFrame): one or more dataframes used as reference for missing dates
+
+    Returns:
+    pandas.DataFrame: the original dataframe with missing dates added
+    """
+    try:
+        dates = set(df['Year'].values)
+        reference_dates = set().union(*[set(df['Year'].values) for df in reference_dfs if not df.empty])
+        dates_not_in_df = list(reference_dates - dates)
+        if dates_not_in_df:
+            additional_dataframe = pd.DataFrame(0, columns=df.columns, index=range(len(dates_not_in_df)))
+            additional_dataframe['Year'] = dates_not_in_df
+            df = pd.concat([additional_dataframe, df])
+        return df
+    except:
         raise CustomException('Error while adding the missing dates in add_missing_dates() function')
 
 def reformat_dataframe(df, name):
