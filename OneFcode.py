@@ -1,9 +1,9 @@
 import pandas as pd
-import argparse
 from src.exception import CustomException
 from src.logger import logging 
 from src.components.data_ingestion import read_files
 from src.pipeline.transformation_pipeline import transform
+from src.sql_data_conn.queries import create_db
 logging.info('Setting up')
 def main(input_path,output_path):    
     CPI_data,ER_data,Exports_data=read_files(input_path)
@@ -13,8 +13,6 @@ def main(input_path,output_path):
     merged = pd.merge(formatted_CPI, formatted_ER, on=['Date', 'Country'], how='outer')
     merged = pd.merge(merged, formatted_Exports, on=['Date', 'Country'], how='outer')
     logging.info('Process is done')
-    #merged.to_csv(output_path+'transformed_data.csv')
-    formatted_CPI.to_csv(output_path+'CPI_transformed.csv')
-    formatted_ER.to_csv(output_path+'ER_transformed.csv')
-    formatted_Exports.to_csv(output_path+'Exports_transformed.csv')
+    ###merged.to_csv(output_path+'transformed_data.csv',index=False)
+    create_db(merged)
 main('./Monthly_data/','./Transformed_data/')
