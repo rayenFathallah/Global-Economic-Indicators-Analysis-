@@ -33,7 +33,6 @@ def add_missing_countries(df, reference_df1,reference_df2):
         reference_df2=rename_columns(reference_df2)
         df=rename_columns(df)
         columns = set(df.columns)
-        columns = set(df.columns)
         reference1_columns = set(reference_df1.columns)
         reference2_columns = set(reference_df2.columns)
         not_in_df = list(reference1_columns.union(reference2_columns) - columns)
@@ -41,7 +40,18 @@ def add_missing_countries(df, reference_df1,reference_df2):
     except:
         raise CustomException('Error while adding the missing countries in add_missing_countries() function')
     return df 
-        
+def add_missing_countries_2df(df, reference_df): 
+    try : 
+        reference_df=rename_columns(reference_df)
+        df=rename_columns(df)   
+        columns = set(df.columns)
+        reference_columns = set(reference_df.columns)   
+        not_in_df = list(reference_columns- columns)
+        df[not_in_df] = 0
+    except:
+        raise CustomException('Error while adding the missing countries in add_missing_countries() function')
+    return df 
+
 def add_missing_dates(df, reference_df1,reference_df2):
 # Add missing Dates for each dataframe
     try : 
@@ -56,6 +66,22 @@ def add_missing_dates(df, reference_df1,reference_df2):
             reference2_dates=set()  
         dates_not_in_df = list(reference1_dates.union(reference2_dates) - dates)
         additional_dataframe = pd.DataFrame(columns=df.columns)
+        additional_dataframe['Year'] = dates_not_in_df
+        columns = [col for col in df.columns if col != "Year"]
+        additional_dataframe[columns] = 0
+        df = pd.concat([additional_dataframe, df])
+        return df
+    except : 
+        raise CustomException('Error while adding the missing dates in add_missing_dates() function')
+def add_missing_dates_2df(df,reference_df): 
+    try : 
+        dates = set(df['Year'].values)
+        if(reference_df.empty==False): 
+            reference_dates = set(reference_df['Year'].values)
+        else : 
+            reference_dates=set()
+        additional_dataframe = pd.DataFrame(columns=df.columns)
+        dates_not_in_df = list(reference_dates- dates)
         additional_dataframe['Year'] = dates_not_in_df
         columns = [col for col in df.columns if col != "Year"]
         additional_dataframe[columns] = 0

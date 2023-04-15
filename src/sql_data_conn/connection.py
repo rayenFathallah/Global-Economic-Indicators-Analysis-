@@ -5,7 +5,7 @@ def get_connection():
     Create a connection object for the SQL Server database.
     """
     
-    server = 'XX' 
+    server = 'DESKTOP-750KGBF' 
     database = 'International_indicators' 
     cnxn = pyodbc.connect(
         'DRIVER={ODBC Driver 18 for SQL Server}; \
